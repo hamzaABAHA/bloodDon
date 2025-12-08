@@ -4,16 +4,19 @@ import com.blooddon.backend.dto.RegisterDonorRequest;
 import com.blooddon.backend.models.BloodType;
 import com.blooddon.backend.models.DonorProfile;
 import com.blooddon.backend.models.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class DonorMapper {
 
-    public static User toUser(RegisterDonorRequest dto) {
+    public static User toUser(RegisterDonorRequest dto, PasswordEncoder encoder) {
         User user = new User();
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+        user.setPassword(encoder.encode(dto.getPassword())); // 🔥 HASHED
         user.setRole(User.Role.DONOR);
         return user;
     }
+
+
 
     public static BloodType convertBloodType(String input) {
         switch (input.trim().toUpperCase()) {

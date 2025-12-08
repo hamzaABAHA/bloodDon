@@ -1,5 +1,7 @@
 package com.blooddon.backend.controllers;
 
+import com.blooddon.backend.dto.DonationHistoryDto;
+import com.blooddon.backend.models.DonorBadge;
 import com.blooddon.backend.models.DonorProfile;
 import com.blooddon.backend.models.Review;
 import com.blooddon.backend.services.DonorService;
@@ -45,4 +47,16 @@ public class DonorController {
     public int getTotalPoints(@PathVariable Long donorId) {
         return donorService.getTotalPoints(donorId);
     }
+    //history of donor
+    @GetMapping("/history/{donorId}")
+    public List<DonationHistoryDto> getDonationHistory(@PathVariable Long donorId) {
+        return donorService.getDonationHistoryDTO(donorId);
+    }
+    //badge
+    @GetMapping("/badge/{donorId}")
+    public DonorBadge getDonorBadge(@PathVariable Long donorId) {
+        return donorService.getDonorBadge(donorId);
+    }
+
+
 }

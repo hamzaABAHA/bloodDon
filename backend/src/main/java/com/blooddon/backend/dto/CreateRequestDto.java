@@ -2,6 +2,7 @@ package com.blooddon.backend.dto;
 
 import com.blooddon.backend.models.BloodType;
 
+
 public class CreateRequestDto {
 
     private String requesterFullName;
@@ -9,6 +10,7 @@ public class CreateRequestDto {
     private BloodType bloodType;
     private String caseDescription;
     private String city;
+    private Long requesterId;
 
     // Map location
     private double latitude;
@@ -17,6 +19,9 @@ public class CreateRequestDto {
     private String motivationMessage;
 
     public CreateRequestDto() {}
+
+    public Long getRequesterId() { return requesterId; }
+    public void setRequesterId(Long requesterId) { this.requesterId = requesterId; }
 
     public String getRequesterFullName() { return requesterFullName; }
     public void setRequesterFullName(String requesterFullName) { this.requesterFullName = requesterFullName; }
@@ -43,5 +48,6 @@ public class CreateRequestDto {
     public void setLocationLabel(String locationLabel) { this.locationLabel = locationLabel; }
 
     public String getMotivationMessage() { return motivationMessage; }
-    public void setMotivationMessage(String motivationMessage) { this.motivationMessage = motivationMessage; }
+    public void setMotivationMessage(String motivationMessage) { this.motivationMessage = motivationMessage;}
 }
+

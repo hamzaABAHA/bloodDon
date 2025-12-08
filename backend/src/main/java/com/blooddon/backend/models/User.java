@@ -1,6 +1,8 @@
 package com.blooddon.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -19,6 +21,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -26,8 +29,20 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
-    public User() {
-    }
+    // Optional 1-to-1 relation with DonorProfile
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private DonorProfile donorProfile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private RequesterProfile requesterProfile;
+
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    public User() {}
 
     public User(String email, String password, Role role) {
         this.email = email;
@@ -35,31 +50,31 @@ public class User {
         this.role = role;
     }
 
-    public Long getId() {
-        return id;
+    @PrePersist
+    public void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
-    public String getEmail() {
-        return email;
+    @PreUpdate
+    public void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public Long getId() { return id; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public Role getRole() {
-        return role;
-    }
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
 
-    public void setRole(Role role) {
-        this.role = role;
-    }
+    public DonorProfile getDonorProfile() { return donorProfile; }
+    public void setDonorProfile(DonorProfile donorProfile) { this.donorProfile = donorProfile; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
 }

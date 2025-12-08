@@ -12,19 +12,27 @@ public class BloodRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Requester info
+    // --- RELATIONSHIPS ---
+    @ManyToOne(fetch = FetchType.LAZY) // Use LAZY fetch for performance
+    @JoinColumn(name = "requester_id", nullable = false)
+    private User requester;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "blood_request_id") // Recommended for OneToMany
+    private List<Review> reviews = new ArrayList<>();
+
+    // --- DENORMALIZED REQUESTER INFO ---
+    // Stored for quick display without joining User/RequesterProfile
     private String requesterFullName;
     private String requesterPhone;
 
-    // Blood type
+    // --- REQUEST DETAILS ---
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private BloodType bloodType;
 
-    // Request details
     private String caseDescription;
     private String city;
-
-
     private double latitude;
     private double longitude;
     private String locationLabel;
@@ -32,39 +40,28 @@ public class BloodRequest {
     @Column(length = 500)
     private String motivationMessage;
 
-    // Multi-donor matching
+    // --- MATCHING & STATE ---
+    // Stores the USER IDs of donors who have been matched.
     @ElementCollection
+    @CollectionTable(name = "blood_request_matched_donors", joinColumns = @JoinColumn(name = "blood_request_id"))
+    @Column(name = "user_id")
     private List<Long> matchedDonorIds = new ArrayList<>();
 
-    private boolean isCompleted;
+    private boolean isCompleted = false;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Review> reviews = new ArrayList<>();
-
+    // --- TIMESTAMPS ---
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     public BloodRequest() {}
 
-    //  MAPPING
-    public static BloodRequest fromDTO(
-            com.blooddon.backend.dto.CreateRequestDto dto,
-            BloodType bloodType
-    ) {
-        BloodRequest req = new BloodRequest();
-        req.setRequesterFullName(dto.getRequesterFullName());
-        req.setRequesterPhone(dto.getRequesterPhone());
-        req.setBloodType(bloodType);
-        req.setCaseDescription(dto.getCaseDescription());
-        req.setCity(dto.getCity());
-        req.setLatitude(dto.getLatitude());
-        req.setLongitude(dto.getLongitude());
-        req.setLocationLabel(dto.getLocationLabel());
-        req.setMotivationMessage(dto.getMotivationMessage());
-        return req;
-    }
+    // --- FIX: REMOVED STATIC fromDTO METHOD ---
+    // This logic belongs in a dedicated Mapper class, not the entity.
 
-    //  TIMESTAMP
+    // --- LIFECYCLE CALLBACKS ---
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -76,7 +73,12 @@ public class BloodRequest {
         this.updatedAt = LocalDateTime.now();
     }
 
+    // --- GETTERS & SETTERS ---
+
     public Long getId() { return id; }
+
+    public User getRequester() { return requester; }
+    public void setRequester(User requester) { this.requester = requester; }
 
     public String getRequesterFullName() { return requesterFullName; }
     public void setRequesterFullName(String requesterFullName) { this.requesterFullName = requesterFullName; }
@@ -107,6 +109,8 @@ public class BloodRequest {
 
     public List<Long> getMatchedDonorIds() { return matchedDonorIds; }
     public void setMatchedDonorIds(List<Long> matchedDonorIds) { this.matchedDonorIds = matchedDonorIds; }
+
+
 
     public boolean isCompleted() { return isCompleted; }
     public void setCompleted(boolean completed) { isCompleted = completed; }
